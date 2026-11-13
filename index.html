@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#A8E600">
+  <meta name="description" content="ভূমি উন্নয়ন করের আনুমানিক হিসাব">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <title>ভূমি উন্নয়ন করের (আনুমানিক) হিসাব</title>
+  <style>
+    :root { color-scheme: light; --lime:#A8E600; --green:#08752D; --dark:#173900; --pale:#E8F5E9; --line:#d9e2d8; }
+    * { box-sizing:border-box; }
+    html { min-height:100%; height:auto; background:#f3f5f1; }
+    body { margin:0; min-height:100%; height:auto; overflow-x:hidden; overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior-y:contain; background:#f3f5f1; color:#172017; font-family:-apple-system,BlinkMacSystemFont,"Noto Sans Bengali","Noto Sans",Arial,sans-serif; }
+    .app { width:min(100%,520px); min-height:100vh; min-height:100svh; min-height:100dvh; height:auto; margin:0 auto; background:#fff; box-shadow:0 0 24px #0000000d; padding-bottom:calc(20px + env(safe-area-inset-bottom, 0px)); }
+    header { background:var(--lime); color:var(--dark); text-align:center; padding:20px 16px 18px; }
+    h1 { margin:0; font-size:clamp(23px,6vw,30px); line-height:1.35; font-weight:800; }
+    main { padding:13px 16px calc(28px + env(safe-area-inset-bottom, 0px)); }
+    .field { padding:7px 0 9px; }
+    .caption { display:block; font-size:16px; font-weight:700; margin:0 0 6px; }
+    .entry-row { display:flex; align-items:center; gap:8px; }
+    input { width:100%; min-width:0; height:43px; border:1px solid #cbd5ca; border-radius:8px; background:#fff; padding:0 12px; text-align:center; font-size:19px; font-weight:600; color:#182018; outline:none; }
+    input:focus { border-color:#5b9b39; box-shadow:0 0 0 2px #5b9b3920; }
+    input:disabled { background:#f0f3ef; color:#263426; opacity:1; -webkit-text-fill-color:#263426; }
+    .amount { flex:0 0 132px; min-height:43px; border-radius:8px; background:#f0f3ef; display:flex; justify-content:center; align-items:center; padding:6px 5px; color:var(--green); font-weight:800; font-size:15px; text-align:center; overflow-wrap:anywhere; }
+    .lock { flex:0 0 54px; height:38px; border:1px solid #b8c7b6; border-radius:8px; background:#fff; color:#36533a; font-size:13px; font-weight:700; }
+    .lock:disabled { color:#08752d; background:#e8f5e9; border-color:#b6d7bb; }
+    .result { min-height:43px; background:var(--pale); border:1px solid #c8e2cb; border-radius:8px; display:flex; align-items:center; justify-content:center; padding:7px; color:var(--green); font-size:19px; font-weight:800; text-align:center; }
+    .total-field { padding-top:15px; padding-bottom:24px; }
+    .total { display:block; width:100%; min-height:66px; background:#ddf3de; border:2px solid #198344; border-radius:11px; padding:14px 8px; color:#006b27; font-size:clamp(23px,6vw,29px); font-weight:900; text-align:center; overflow-wrap:anywhere; }
+    .separator { border:0; border-top:1px solid var(--line); margin:5px 0; }
+    .reset { width:100%; min-height:66px; margin-top:8px; border:0; border-radius:10px; background:#d92332; color:#fff; font-size:18px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:9px; box-shadow:0 2px 4px #00000018; }
+    .reset:active { transform:scale(.99); background:#bd1826; }
+    .reset, .total, .result, .amount { flex-shrink:0; }
+    .note { text-align:center; color:#667166; font-size:11px; line-height:1.5; margin:10px 3px 0; }
+    @media (max-width:360px) { main{padding-left:11px;padding-right:11px}.amount{flex-basis:112px;font-size:13px}.lock{flex-basis:48px} }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header><h1>ভূমি উন্নয়ন করের (আনুমানিক) হিসাব</h1></header>
+  <main>
+    <section class="field">
+      <label class="caption" for="land1">নাল জমির পরিমাণ</label>
+      <div class="entry-row">
+        <input id="land1" inputmode="numeric" autocomplete="off" maxlength="4" placeholder="0000" aria-label="নাল জমির পরিমাণ">
+        <output class="amount" id="amount1">—</output>
+        <button class="lock" id="lock1" type="button">লক</button>
+      </div>
+    </section>
+    <hr class="separator">
+    <section class="field">
+      <label class="caption" for="land2">বাড়ি সহ অন্যান্য জমির পরিমাণ</label>
+      <div class="entry-row">
+        <input id="land2" inputmode="numeric" autocomplete="off" maxlength="4" placeholder="0000" aria-label="বাড়ি সহ অন্যান্য জমির পরিমাণ">
+        <output class="amount" id="amount2">—</output>
+        <button class="lock" id="lock2" type="button">লক</button>
+      </div>
+    </section>
+    <hr class="separator">
+    <section class="field">
+      <label class="caption" for="current">হাল দাবী</label>
+      <output class="result" id="current">—</output>
+    </section>
+    <hr class="separator">
+    <section class="field">
+      <label class="caption" for="older">৩ বছরের উর্দ্ধের বকেয়া</label>
+      <div class="entry-row">
+        <input id="older" inputmode="numeric" autocomplete="off" maxlength="2" placeholder="00" aria-label="৩ বছরের উর্দ্ধের বকেয়া">
+        <button class="lock" id="lock3" type="button">লক</button>
+      </div>
+      <output class="result" id="olderResult" style="margin-top:6px">—</output>
+    </section>
+    <hr class="separator">
+    <section class="field">
+      <label class="caption" for="recent">বিগত ৩ বছরের বকেয়া</label>
+      <div class="entry-row">
+        <input id="recent" inputmode="numeric" autocomplete="off" maxlength="2" placeholder="00" aria-label="বিগত ৩ বছরের বকেয়া">
+        <button class="lock" id="lock4" type="button">লক</button>
+      </div>
+      <output class="result" id="recentResult" style="margin-top:6px">—</output>
+    </section>
+    <hr class="separator">
+    <section class="field">
+      <label class="caption">জরিমানা</label>
+      <output class="result" id="penalty">—</output>
+    </section>
+    <hr class="separator">
+    <section class="field total-field">
+      <label class="caption">সর্বমোট দাবী</label>
+      <output class="total" id="grandTotal">—</output>
+    </section>
+    <button class="reset" id="reset" type="button"><span aria-hidden="true">↻</span> পুনরায় করুন</button>
+    <p class="note">ইনপুট দেওয়ার পর লক করুন। পুনরায় করুন চাপলে সব তথ্য মুছে যাবে।<br>এটি আনুমানিক হিসাব; সরকারি কর নির্ধারণের বিকল্প নয়।</p>
+  </main>
+</div>
+<script>
+(() => {
+  const ids = ['land1','land2','older','recent'];
+  const locked = {land1:false,land2:false,older:false,recent:false};
+  const $ = id => document.getElementById(id);
+  const fmt = n => n.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const num = id => Number($(id).value || 0);
+  function render() {
+    const a=num('land1'), b=num('land2'), old=num('older'), recent=num('recent');
+    const current=a*2+b*10, oldDue=old*current, recentDue=recent*current;
+    const penalty=recentDue*0.0625, total=current+oldDue+recentDue+penalty;
+    $('amount1').textContent=a>0?fmt(a*2)+' /-':'—';
+    $('amount2').textContent=b>0?fmt(b*10)+' /-':'—';
+    $('current').textContent=current>0?fmt(current)+' /-':'—';
+    $('olderResult').textContent=current>0 && $('older').value!==''?fmt(oldDue)+' /-':'—';
+    $('recentResult').textContent=current>0 && $('recent').value!==''?fmt(recentDue)+' /-':'—';
+    $('penalty').textContent=recentDue>0?fmt(penalty)+' /-':'—';
+    $('grandTotal').textContent=current>0?fmt(total)+' /-':'—';
+  }
+  ids.forEach((id,index) => {
+    const el=$(id), lock=$('lock'+(index+1));
+    const max=index<2?4:2;
+    el.addEventListener('input', () => {
+      let value=el.value.replace(/[^0-9]/g,'').slice(0,max);
+      if(index>=2 && Number(value)>12) value=value.slice(0,-1);
+      el.value=value; render();
+    });
+    lock.addEventListener('click', () => {
+      if(el.value==='') return;
+      locked[id]=true; el.disabled=true; lock.disabled=true; lock.textContent='লকড';
+    });
+  });
+  $('reset').addEventListener('click', () => {
+    ids.forEach((id,index) => {
+      $(id).value=''; $(id).disabled=false; locked[id]=false;
+      const lock=$('lock'+(index+1)); lock.disabled=false; lock.textContent='লক';
+    });
+    render();
+  });
+  render();
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+  }
+})();
+</script>
+</body>
+</html>
